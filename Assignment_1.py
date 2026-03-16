@@ -17,7 +17,7 @@ y = drug_data_target_classes
 X = drug_data_features
 
 # split into training and testing data  
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20,  stratify=y) # will split the data in train and test data, with a 80 20 split with balance in the class proportions present in both splits
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20,  stratify=y) # will split the data in train and test data, with a 80 20 split with balance in the class proportions present in both splits because of stratify 
 
 # encode the categorical data to work with the implementation
 labelEncoder = LabelEncoder() # basic label encoding will be used to encode the target class variables in training set, done in alphabetical order of the categorical data 
@@ -53,7 +53,6 @@ X_test["BP"] = encoded_BP_feature_testing
 X_test["Cholesterol"] = encoded_cholestrol_feature_testing
 X_test = pd.concat([X_test, encoded_sex_feature_testing], axis=1) # concatenates the features training data samples dataframe with the dataframe for the one hot encoded sex feature (axis 1 is horizontal like in Numpy)
 X_test.drop(columns=["Sex"], inplace=True) # will drop the column for Sex which has the categorical data which was turned one hot encoded in numerical data
-
 
 # train/fit the model with the proper encoded and processed data  (Entropy)
 entropy_decision_tree = DecisionTreeClassifier(criterion="entropy") # will use entropy as the criteria for determining splits and nodes in the tree
@@ -103,3 +102,26 @@ print("Log Loss Confusion Martix:", log_loss_confusion_matrix, sep="\n")
 
 log_loss_cross_validation_scores = cross_val_score(log_loss_tree, X=X_train, y=y_train ,cv=10)
 print("Log Loss Validation Average:", log_loss_cross_validation_scores.mean())
+print(log_loss_cross_validation_scores)
+
+
+# train a decision tree with entropy criterion with a max depth of 1 
+small_depth_entropy_tree = DecisionTreeClassifier(criterion="entropy",max_depth=1)
+small_depth_entropy_tree.fit(X_train, y_train)
+small_depth_entropy_pred = small_depth_entropy_tree.predict(X_test)
+small_depth_entropy_accuracy = accuracy_score(y_test, small_depth_entropy_pred)
+print("Entropy Small Depth Accuracy",small_depth_entropy_accuracy)
+
+# small depth tree with gini criterion
+small_depth_gini_tree = DecisionTreeClassifier(criterion="gini",max_depth=2)
+small_depth_gini_tree.fit(X_train, y_train)
+small_depth_gini_pred = small_depth_gini_tree.predict(X_test)
+small_depth_gini_accuracy = accuracy_score(y_test, small_depth_gini_pred)
+print("Gini Small Depth Accuracy",small_depth_gini_accuracy)
+
+
+small_depth_log_loss_tree = DecisionTreeClassifier(criterion="log_loss",max_depth=3)
+small_depth_log_loss_tree.fit(X_train, y_train)
+small_depth_log_loss_pred = small_depth_log_loss_tree.predict(X_test)
+small_depth_log_loss_accuracy = accuracy_score(y_test, small_depth_log_loss_pred)
+print("Log Loss Small Depth Accuracy",small_depth_log_loss_accuracy)
